@@ -18,21 +18,32 @@
 <body>
 <nav class="navbar navbar-expand-lg">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="/">Art Exhibition Gallery</a>
+    <a class="navbar-brand fw-bold" href="/art/">Art Exhibition Gallery</a>
     <span class="navbar-text ms-auto">The 69th National Exhibition of Art</span>
   </div>
 </nav>
 
 <main class="container py-5">
-  <h1 class="mb-4">ผลงานที่ชื่นชอบ</h1>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">ผลงานที่ชื่นชอบ</h1>
+    <a href="upload.php" class="btn btn-primary">➕ เพิ่มผลงาน</a>
+  </div>
+
   <div class="row g-4">
     <?php
-      $sql = "SELECT id, title, description, image_url FROM artworks ORDER BY id ASC LIMIT 50";
+      $sql = "SELECT id, title, description, image_url FROM artworks ORDER BY id DESC";
       if ($res = $mysqli->query($sql)) {
+        if ($res->num_rows === 0) {
+          echo '<div class="col-12"><div class="alert alert-warning">ยังไม่มีข้อมูลผลงาน กรุณาเพิ่มผ่านหน้า <a href="upload.php">อัปโหลด</a></div></div>';
+        }
         while ($row = $res->fetch_assoc()) {
           $title = htmlspecialchars($row['title']);
           $desc  = nl2br(htmlspecialchars($row['description']));
           $img   = htmlspecialchars($row['image_url']);
+          // ถ้า path ไม่ใช่ URL เต็ม ให้ prepend ./art/
+          if (!preg_match('/^https?:\\/\\//', $img)) {
+            $img = $img;
+          }
           echo '<div class="col-12 col-md-6 col-lg-4">';
           echo '  <div class="card h-100">';
           echo '    <img src="'.$img.'" class="card-img-top" alt="'.$title.'">';
